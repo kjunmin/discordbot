@@ -2,8 +2,7 @@ const Discord = require("discord.js");
 const mysql = require('mysql');
 const bot = new Discord.Client();
 const request = require('ajax-request');
-const token = "MTk0NzkwNDkxNjcyNDEyMTcw.Cq7Wgw.3ELG4A8KWfS5dq5DHXsZUShJQH8";
-const jsonfile = require('jsonfile');
+const token = "<bot token>";
 const http = require('http');
 
 
@@ -13,8 +12,8 @@ const http = require('http');
 var connection = mysql.createConnection({
 	host: "127.0.0.1",
 	user: "root",
-	password: "viewsonic1",
-	database: "melonbot"
+	password: "password",
+	database: "botdatabase"
 });
 connection.connect();
 
