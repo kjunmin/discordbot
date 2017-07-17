@@ -1,0 +1,24 @@
+{
+  "name": "discordbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mephet/discordbot.git"
+  },
+  "author": "Matthew Koh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mephet/discordbot/issues"
+  },
+  "homepage": "https://github.com/mephet/discordbot#readme",
+  "dependencies": {
+    "discord.js": "^11.1.0",
+    "mongoose": "^4.11.3",
+    "nodemon": "^1.11.0"
+  }
+}
