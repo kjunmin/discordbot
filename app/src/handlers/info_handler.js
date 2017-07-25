@@ -10,7 +10,9 @@ module.exports.helpLists =function(message) {
     // helpList.push("**m!decidewinner [matchid]**:	 Analyses results of concluded match and awards bet winners. \n");
     helpList.push("**" + config.prefix + "register**:	 Create an account.\n")
     helpList.push("**" + config.prefix + "dailies**: 	Claim daily credits. Resets in 24 hours. \n")
+    helpList.push("**" + config.prefix + "tip [User] [Amount]**:	 Tip a user an amount from your credits.\n")
     helpList.push("**" + config.prefix + "alarm**: 	Sends an alarm message to the entire chat. \n")
+    helpList.push("**" + config.prefix + "setalarm [message]**: 	Sets custom tts alarm message. \n")
     helpList.push("**" + config.prefix + "changecolour [colour value]**: 	Changes current role colour. Colour value must be in hex or base 10 number. \n")
     helpList.push("**" + config.prefix + "bank**: 	Shows how many credits you have stashed away. \n")
     message.channel.send(String(helpList).replace(/,/g, " "));

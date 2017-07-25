@@ -16,20 +16,6 @@ bot.on("ready", () => {
   console.log("Ready and awaiting commands...");
 });
 
-// bot.on('message', message => {
-// 	message.channel.
-// })
-bot.on("message", message => {
-	if (message.content.startsWith("a")  && !message.author.bot) {
-		message.guild.channels.find("name", "general").sendMessage("blabla");
-	}
-});
-
-// bot.on("guildMemberAvailable", member => {
-// 	// if (message.content.startsWith("a")  && !message.author.bot) {
-// 		member.guild.channels.find("name", "general").sendMessage("blabla");
-// 	// }
-// });
 messageService.startMessageService(bot);
 
 
