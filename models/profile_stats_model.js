@@ -36,13 +36,14 @@ const ProfileStatsSchema = mongoose.Schema({
 const ProfileStats = module.exports = mongoose.model('ProfileStats', ProfileStatsSchema);
 
 //API Query Functions
-module.exports.getProfileById = (discord_id, callback) => {
-    let query = {discord_id: discord_id};
+module.exports.getProfileById = (discordId, callback) => {
+    let query = {discord_id: discordId};
     ProfileStats.findOne(query, (err, record) => {
+        if (err) throw err;
         if (record) {
             callback(record);
         } else {
-            callback(err);
+            callback(null);
         }
         
     });
@@ -51,40 +52,44 @@ module.exports.getProfileById = (discord_id, callback) => {
 // *NOTE: Unreliable. Use getProfileById for accurate results 
 module.exports.getProfileByUsername = (username, callback) => {
     let query = {username: username};
-    ProfileStats.findOne(query, callback);
-};
-
-module.exports.getLastClaimedTimestamp = (discord_id, datetime) => {
-    let query = {discord_id: discord_id};
     ProfileStats.findOne(query, (err, record) => {
+        if (err) throw err;
         if (record) {
-            datetime(record.last_claimed_timestamp);
+            callback(record);
         } else {
-            //Error, record does not exist
-            datetime(false);
+            callback(null);
         }
     });
 };
 
-module.exports.doesUserExist = (discord_id, userExists) => {
-    let query = {discord_id: discord_id};
-    ProfileStats.findOne(query, (err, record) => {
-        if (record) {
-            //Username already exists in database
-            userExists(true);
+module.exports.getLastClaimedTimestamp = (discordId, callback) => {
+    ProfileStats.getProfileById(discordId, res => {
+        if (res) {
+            callback(res.last_claimed_timestamp);
         } else {
-            //Username is untaken
-            userExists(false);
+            callback(false);
         }
-    });
+    }) 
+};
+
+module.exports.doesUserExist = (discordId, callback) => {
+    ProfileStats.getProfileById(discordId, res => {
+        if (res) {
+            //User already exists in database
+            callback(true);
+        } else {
+            //User is unregistered
+            callback(false);
+        }
+    })
 };
 
 
 // Experience Getters/Setters
 
-module.exports.getExperience = (id, callback) => {
-    ProfileStats.getProfileById(id, record => {
-        if (record) {
+module.exports.getExperience = (discordId, callback) => {
+    ProfileStats.getProfileById(discordId, res => {
+        if (res) {
             callback(record.credits);
         } else {
             callback(false);
@@ -92,11 +97,11 @@ module.exports.getExperience = (id, callback) => {
     })
 }
 
-module.exports.addExperience = (id, experience, callback) => {
-    ProfileStats.getProfileById(id, record => {
-        if (record) {
-            record.experience += experience;
-            record.save();
+module.exports.addExperience = (discordId, experience, callback) => {
+    ProfileStats.getProfileById(discordId, res => {
+        if (res) {
+            res.experience += experience;
+            res.save();
             callback(true);
         } else {
             callback(false);
@@ -130,71 +135,59 @@ module.exports.addProfile = (id, username, callback) => {
     
 };
 
-module.exports.delProfile = (discord_id, callback) => {
-   
-};
-
 // Credit Getters/setters
 
-module.exports.getCredits = (discord_id, callback) => {
-    let query = {discord_id: discord_id};
-    ProfileStats.findOne(query, (err, record) => {
-        if (record) {
-            callback(record.credits);
+module.exports.getCredits = (discordId, callback) => {
+    ProfileStats.getProfileById(discordId, res => {
+        if (res) {
+            callback(res.credits);
         } else {
-            //Error, record does not exist
             callback(false);
         }
     });
 }
 
 module.exports.isSameId = (discordId, usernameCheck, callback) => {
-    let query = {discord_id: discordId};
-    ProfileStats.findOne(query, (err, record) => {
-        if (record) {
-            if (record.username == usernameCheck) {
+    ProfileStats.getProfileById(discordId, res => {
+        if (res) {
+            if (res.username == usernameCheck) {
                 callback(true);
             } else {
                 callback(false);
             }
         }
-    })
+    });
 }
 
 module.exports.setCredits = (discordId, credits) => {
-    let query = {discord_id: discordId};
-    ProfileStats.findOne(query, (err, record) => {
-        if (record) {
-            record.credits = credits;
-            record.save();
-        }
-    })
+    ProfileStats.getProfileById(discordId, res => {
+        res.credits = credits;
+        res.save();
+    });
 }
 
 // Transfers credits from source account to destination account
 module.exports.transferCredits = (sourceId, destinationUsername, transferCredits, callback) => {
-    let query = {discord_id: sourceId};
-    let query2 = {username: destinationUsername};
     var x = ProfileStats.isSameId(sourceId, destinationUsername, isMatch => {
         if (!isMatch) {
-            ProfileStats.findOne(query, (err, record) => {
-                if (record) {
-                    if (record.credits >= transferCredits) {
-                        ProfileStats.findOne(query2, (err, record2) => {
-                            if (record2) {
-                                record.credits -= parseInt(transferCredits);
-                                record2.credits += parseInt(transferCredits);
-                                record.save();
-                                record2.save();
+            ProfileStats.getProfileById(sourceId, res1 => {
+                if (res1) {
+                    if (res1.credits >= transferCredits) {
+                        ProfileStats.getProfileByUsername(destinationUsername, res2 => {
+                            if (res2) {
+                                res1.credits -= parseInt(transferCredits);
+                                res2.credits += parseInt(transferCredits);
+                                res1.save();
+                                res2.save();
                                 callback(null);
                             } else {
                                 callback("The person you are trying to tip does not exist. Please use the username they created the account with.");
                             }
-                        });
+                        })
                     } else {
                         callback("You do not have sufficient credits!");
                     }
-                } else {
+                }  else {
                     callback("Please register before you can perform this action");
                 }
             });
@@ -204,57 +197,69 @@ module.exports.transferCredits = (sourceId, destinationUsername, transferCredits
     });
 }
 
-module.exports.addCredits = (discord_id, credits, callback) => {
-    let query = {discord_id: discord_id};
-    ProfileStats.findOne(query, (err, record) => {
-        if (record) {
-            record.credits += credits;
-            record.last_claimed_timestamp = new Date();
-            record.save();
+module.exports.claimDailies = (discordId, credits, callback) => {
+    ProfileStats.getProfileById(discordId, res=> {
+        if (res) {
+            res.credits += credits;
+            res.last_claimed_timestamp = new Date();
+            res.save();  
             callback(true);
         } else {
             callback(false);
         }
-    });
+    })
+}
+
+module.exports.addCredits = (discordId, credits, callback) => {
+    console.log(discordId);
+    ProfileStats.getProfileById(discordId, res => {
+        if (res) {
+            res.credits += credits;
+            res.save();
+            callback(true);
+        } else {
+            callback(false);
+        }
+    })
 };
 
-module.exports.removeCredits = (discord_id, credits, callback) => {
-    let query = {discord_id: discord_id};
-    ProfileStats.findOne(query, (err, record) => {
-        if (record) {
-            record.credits -= credits;
-            record.last_claimed_timestamp = new Date();
-            record.save();
-            callback(true);
+module.exports.removeCredits = (discordId, credits, callback) => {
+    ProfileStats.getProfileById(discordId, res=> {
+        if (res) {
+            if (res.credits >= credits) {
+                res.credits -= credits;
+                res.save();
+                callback(true);
+            } else {
+                callback(false);
+            }
         } else {
             callback(false);
         }
-    });
+    })
 };
 
 //Alarm Getters/Setters
 
-module.exports.getAlarmMessage = (discord_id, callback) => {
-    let query = {discord_id: discord_id};
-    ProfileStats.findOne(query, (err, record) => {
-        if (record) {
-            callback(record.alarm_message);
+module.exports.getAlarmMessage = (discordId, callback) => {
+    ProfileStats.getProfileById(discordId, res => {
+        if (res) {
+            callback(res.alarm_message);
         } else {
-            //Error, record does not exist
+             //Error, record does not exist
             callback(false);
         }
     });
 }
 
-module.exports.setAlarmMessage = (discord_id, alarm_message, callback) => {
-    let query = {discord_id: discord_id};
-    ProfileStats.findOne(query, (err, record) => {
-        if (record) {
-            record.alarm_message = alarm_message;
-            record.save();
+module.exports.setAlarmMessage = (discordId, alarmMessage, callback) => {
+    ProfileStats.getProfileById(discordId, res => {
+        if (res) {
+            res.alarm_message = alarmMessage;
+            res.save();
             callback(true);
         } else {
-            //Error, record does not exist
+             //Error, record does not exist
             callback(false);
         }
     });

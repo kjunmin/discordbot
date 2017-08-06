@@ -1,5 +1,4 @@
 const ProfileStats = require('../../../models/profile_stats_model.js');
-const config = require('../../../config.js')
 
 module.exports.setAlarm = function(message) {
     var discordId = message.author.id;

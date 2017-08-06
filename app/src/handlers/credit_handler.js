@@ -1,9 +1,10 @@
 const ProfileStats = require('../../../models/profile_stats_model.js');
-const config = require('../../../config.js')
 
 const dailyCredits = 100;
+const creditResetTime = 82800
 
-module.exports.claimCredits = function(message) {
+
+module.exports.claimCredits = (message) => {
     
     var discordId = message.author.id;
     var discordUsername = message.author.username;
@@ -13,16 +14,15 @@ module.exports.claimCredits = function(message) {
             // Gets the difference in seconds between the current timestamp and the last claimed timestamp
             var diff = (currDatetime - res)/1000;
             // If the difference is less than 24 hours, display the time left before another claim is possible
-            if (diff < 86400) {
-                const dayInSeconds = 86400;
-                diff = dayInSeconds - diff;
+            if (diff < creditResetTime) {
+                diff = creditResetTime - diff;
                 diffSecs = Math.floor(diff%60);
                 diffMins = Math.floor((diff%3600)/60);
                 diffHrs = Math.floor(diff/3600);
                 message.channel.send("You have " + diffHrs + " Hours," + diffMins + " Mins, " + diffSecs + " Secs to go before you are able to claim another daily! <:biblethump:337835033530466305>")
             } else {
                 // If more than 24 hours have passed since the last claim, add the daily credits to the account credit count
-                ProfileStats.addCredits(discordId, dailyCredits, res => {
+                ProfileStats.claimCredits(discordId, dailyCredits, res => {
                     if (res) {
                         message.channel.send(":moneybag: | **" + discordUsername +", " + dailyCredits + " credits have been deposited in your account!**");
                     } else {
@@ -39,7 +39,7 @@ module.exports.claimCredits = function(message) {
 }
 
 // TODO: Add functionality
-module.exports.transferCredits = function(message) {
+module.exports.transferCredits = (message) => {
     let sourceId = message.author.id;
     let sourceUsername = message.author.username;
     let x = message.content.split(" ");
@@ -59,7 +59,7 @@ module.exports.transferCredits = function(message) {
     }
 }
 
-module.exports.setCredits = function(message) {
+module.exports.setCredits = (message) => {
     let discordId = message.author.id;
     let x = message.content.split(" ");
     let creditsSet = x[1];
@@ -67,7 +67,7 @@ module.exports.setCredits = function(message) {
 }
 
 //Retrieves the stored value in the account
-module.exports.getCredits = function(message) {
+module.exports.getCredits = (message) => {
     var discordUsername = message.author.username;
     var discordId = message.author.id;
     ProfileStats.getCredits(discordId, res => {
