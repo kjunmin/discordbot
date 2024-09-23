@@ -24,7 +24,7 @@ bot.on('ready', () => {
  .catch(console.log);
  return http.get({
  		host: 'api.steampowered.com',
- 		path: '/IDOTA2Match_570/GetLeagueListing/v0001/?key=C21791F6D196C05D08EED5FE79AFC674'
+ 		path: '/IDOTA2Match_570/GetLeagueListing/v0001/?key=<API_KEY>'
  }, function(response) {
  		// Continuously update stream with data
  		var body = '';
