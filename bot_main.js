@@ -3,6 +3,7 @@ const mysql = require('mysql');
 const bot = new Discord.Client();
 const request = require('ajax-request');
 const token = "<bot token>";
+const apiKey = "<API_KEY>";
 const http = require('http');
 
 
@@ -24,7 +25,7 @@ bot.on('ready', () => {
  .catch(console.log);
  return http.get({
  		host: 'api.steampowered.com',
- 		path: '/IDOTA2Match_570/GetLeagueListing/v0001/?key=<API_KEY>'
+ 		path: `/IDOTA2Match_570/GetLeagueListing/v0001/?key=${apiKey}`
  }, function(response) {
  		// Continuously update stream with data
  		var body = '';
@@ -122,7 +123,7 @@ bot.on('message', message => {
 	if (message.content === 'm!parseleaguedata' && !message.author.bot){
 		return http.get({
         host: 'api.steampowered.com',
-        path: '/IDOTA2Match_570/GetLeagueListing/v0001/?key=C21791F6D196C05D08EED5FE79AFC674'
+        path: `/IDOTA2Match_570/GetLeagueListing/v0001/?key=${apiKey}`
     }, function(response) {
         // Continuously update stream with data
         var body = '';
@@ -153,7 +154,7 @@ bot.on('message', message => {
 	if (message.content === 'm!getleagues' && !message.author.bot) {
 		return http.get({
         host: 'api.steampowered.com',
-        path: '/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=C21791F6D196C05D08EED5FE79AFC674'
+        path: `/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=${apiKey}`
     }, function(response) {
         // Continuously update stream with data
         var body = '';
@@ -196,7 +197,7 @@ bot.on('message', message => {
 		}
 		return http.get({
         host: 'api.steampowered.com',
-        path: '/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=C21791F6D196C05D08EED5FE79AFC674'
+        path: `/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=${apiKey}`
     }, function(response) {
         // Continuously update stream with data
         var body = '';
@@ -244,7 +245,7 @@ bot.on('message', message => {
 		var decide_match_id = j[1];
 		return http.get({
 				host: 'api.steampowered.com',
-				path: '/IDOTA2Match_570/GetMatchDetails/V001/?match_id='+decide_match_id+'&key=C21791F6D196C05D08EED5FE79AFC674'
+				path: `/IDOTA2Match_570/GetMatchDetails/V001/?match_id='+decide_match_id+'&key=${apiKey}`
 		}, function(response) {
 				// Continuously update stream with data
 				var body1 = '';
@@ -325,7 +326,7 @@ bot.on('message', message => {
 		}
 		return http.get({
         host: 'api.steampowered.com',
-        path: '/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=C21791F6D196C05D08EED5FE79AFC674'
+        path: `/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=${apiKey}`
     }, function(response) {
         // Continuously update stream with data
         var body = '';
@@ -376,7 +377,7 @@ bot.on('message', message => {
 			else {
 					return http.get({
 			        host: 'api.steampowered.com',
-			        path: '/IDOTA2Match_570/GetLiveLeagueGames/V001/?key=C21791F6D196C05D08EED5FE79AFC674'
+			        path: `/IDOTA2Match_570/GetLiveLeagueGames/V001/?key=${apiKey}`
 			    }, function(response) {
 			        // Continuously update stream with data
 			        var body = '';
