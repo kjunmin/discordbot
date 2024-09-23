@@ -1,7 +1,7 @@
 var http = require('http');
 const LeagueModel = require('../../../models/dota_leagues_model.js');
 
-let apiKey = 'C21791F6D196C05D08EED5FE79AFC674';
+let apiKey = '<API_KEY>';
 let leagueStore = [];
 
 const LeagueHandler = module.exports;
